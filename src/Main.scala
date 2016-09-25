@@ -1,4 +1,4 @@
-import bolt.{SplitSentenceBolt, WordCountBolt}
+import bolt.{SplitSentenceBolt, UpdateCassandraBatchedBolt, WordCountBolt}
 import org.apache.storm.{Config, LocalCluster, StormSubmitter}
 import org.apache.storm.topology.TopologyBuilder
 import org.apache.storm.tuple.Fields
@@ -16,6 +16,9 @@ object Main {
 
       topologyBuilder.setBolt("count", WordCountBolt(), 12)
             .fieldsGrouping("splitter", new Fields("word"))
+
+      topologyBuilder.setBolt("cassandra", UpdateCassandraBatchedBolt(), 8)
+                .fieldsGrouping("count", new Fields("word"))
 
       conf.setNumWorkers(4)
       conf.setDebug(true)
